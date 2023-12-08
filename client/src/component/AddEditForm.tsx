@@ -92,7 +92,6 @@ const AddEditForm = ({
                     )
                     // This will catch the bad request error
                     if (response?.message) {
-                        console.log({ response })
                         setToast({ message: response.message, severity: 'error' })
                     } else {
                         setToast({ message: 'Updated Successfully', severity: 'success' })
