@@ -2,7 +2,8 @@ import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 import { UserModule } from './user/user.module'
 import { ConfigModule } from '@nestjs/config'
-import { LoginModule } from './login/login.module'
+// import { LoginModule } from './login/login.module'
+import { AuthModule } from './auth/auth.module'
 
 @Module({
     imports: [
@@ -11,7 +12,8 @@ import { LoginModule } from './login/login.module'
         }),
         MongooseModule.forRoot(process.env.MONGO_URI ?? 'mongodb://localhost:27017/codist'),
         UserModule,
-        LoginModule
+        // LoginModule,
+        AuthModule
     ]
 })
 export class AppModule {}

@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
+import { Injectable, HttpException, HttpStatus, BadRequestException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { FilterQuery, Model, SortOrder } from 'mongoose'
 import { CreateUserDto } from './dto/create-user.dto'
@@ -57,48 +57,38 @@ export class UserService {
     }
 
     async findAll(req: Request) {
-        const { limit = '10', page = '1', sortBy = 'name', sortOrder = 'asc', search } = req.query as unknown as FindAllQuery
-
-        // Build query for searching
-        const searchQuery: FilterQuery<User> = {}
-        searchQuery.$or = [{ name: new RegExp(search) }, { email: new RegExp(search) }, { mobile: new RegExp(search) }]
-
-        // Build query for sorting
-        const sortQuery = { [sortBy]: (sortOrder === 'asc' ? 1 : -1) as SortOrder }
-
-        // Calculate skip value for pagination
-        const skip = parseInt(page) * parseInt(limit)
-
-        const users = await this.userModel.find(searchQuery).sort(sortQuery).skip(skip).limit(parseInt(limit)).exec()
-        const totalCount = await this.userModel.find(searchQuery).sort(sortQuery).countDocuments()
-
-        return { users, totalCount }
-    }
-
-    async findOne(id: string): Promise<User> {
         try {
-            const user = await this.userModel.findOne({ _id: id })
-            if (!user) throw new Error('User not found')
-            return user
+            const { limit = '10', page = '1', sortBy = 'name', sortOrder = 'asc', search } = req.query as unknown as FindAllQuery
+
+            const searchQuery: FilterQuery<User> = {}
+            searchQuery.$or = [{ name: new RegExp(search) }, { email: new RegExp(search) }, { mobile: new RegExp(search) }]
+            const sortQuery = { [sortBy]: (sortOrder === 'asc' ? 1 : -1) as SortOrder }
+
+            const skip = parseInt(page) * parseInt(limit)
+
+            const users = await this.userModel.find(searchQuery).sort(sortQuery).skip(skip).limit(parseInt(limit)).exec()
+            const totalCount = await this.userModel.find(searchQuery).sort(sortQuery).countDocuments()
+
+            return { users, totalCount }
         } catch (error) {
-            throw new HttpException(
-                error.message,
-                error.message === 'User not found' ? HttpStatus.BAD_REQUEST : HttpStatus.INTERNAL_SERVER_ERROR
-            )
+            throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
-    async findOneByEmail(email: string): Promise<User> {
-        try {
-            const user = await this.userModel.findOne({ email })
-            if (!user) throw new Error('User not found')
-            return user
-        } catch (error) {
-            throw new HttpException(
-                error.message,
-                error.message === 'User not found' ? HttpStatus.BAD_REQUEST : HttpStatus.INTERNAL_SERVER_ERROR
-            )
+    async findOne(id: string) {
+        const user = await this.userModel.findOne({ _id: id })
+        if (!user) {
+            throw new BadRequestException('User not found')
         }
+        return user
+    }
+
+    async findOneByEmail(email: string) {
+        const user = await this.userModel.findOne({ email })
+        if (!user) {
+            throw new BadRequestException('User not found')
+        }
+        return user
     }
 
     async delete(id: string) {
