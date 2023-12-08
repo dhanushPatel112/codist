@@ -1,11 +1,11 @@
-import React, { useCallback } from 'react';
-import { IconButton, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, AlertColor } from '@mui/material';
-import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
-import { useFormik } from 'formik';
-import * as yup from 'yup';
-import { useAppDispatch } from '../app/hooks';
-import { addUserAndFetchUserList, editUserAndFetchUserList } from '../features/user/userSlice';
-import { AxiosError } from 'axios';
+import React, { useCallback } from 'react'
+import { IconButton, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, AlertColor } from '@mui/material'
+import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material'
+import { useFormik } from 'formik'
+import * as yup from 'yup'
+import { useAppDispatch } from '../app/hooks'
+import { addUserAndFetchUserList, editUserAndFetchUserList } from '../features/user/userSlice'
+import { AxiosError } from 'axios'
 
 /**
  *
@@ -20,16 +20,16 @@ const AddEditForm = ({
     handleToastClick,
     setToast
 }: {
-    id: string;
-    handleToastClick: () => void;
+    id: string
+    handleToastClick: () => void
     setToast: React.Dispatch<
         React.SetStateAction<{
-            message: string;
-            severity: AlertColor;
+            message: string
+            severity: AlertColor
         }>
-    >;
+    >
 }) => {
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = React.useState(false)
 
     const validationSchema = yup.object({
         name: yup.string().required('Name is required'),
@@ -56,9 +56,9 @@ const AddEditForm = ({
                 /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/,
                 'Password must contain at least one lowercase letter, one uppercase letter, and one special character'
             )
-    });
+    })
 
-    const dispatch = useAppDispatch();
+    const dispatch = useAppDispatch()
 
     const formik = useFormik({
         initialValues: {
@@ -72,11 +72,11 @@ const AddEditForm = ({
         validationSchema: validationSchema,
         onSubmit: async (values) => {
             try {
-                const { name, email, mobile, password, oldPassword, newPassword } = values;
+                const { name, email, mobile, password, oldPassword, newPassword } = values
                 if (id === 'add') {
-                    await dispatch(addUserAndFetchUserList({ user: { name, email, mobile, password } }));
-                    formik.resetForm();
-                    setToast({ message: 'Added Successfully', severity: 'success' });
+                    await dispatch(addUserAndFetchUserList({ user: { name, email, mobile, password } }))
+                    formik.resetForm()
+                    setToast({ message: 'Added Successfully', severity: 'success' })
                 } else {
                     const response: any = await dispatch(
                         editUserAndFetchUserList({
@@ -89,28 +89,30 @@ const AddEditForm = ({
                                 id
                             }
                         })
-                    );
-                    console.log({ response });
+                    )
                     // This will catch the bad request error
                     if (response?.message) {
-                        setToast({ message: response.message, severity: 'error' });
+                        console.log({ response })
+                        setToast({ message: response.message, severity: 'error' })
                     } else {
-                        setToast({ message: 'Updated Successfully', severity: 'success' });
-                        handleClose();
-                        formik.resetForm();
+                        setToast({ message: 'Updated Successfully', severity: 'success' })
+                        handleClose()
+                        formik.resetForm()
                     }
                 }
-                handleToastClick();
+                handleToastClick()
             } catch (error) {
                 if (error instanceof AxiosError) {
-                    setToast({ message: error.response?.data?.message[0], severity: 'error' });
+                    const message = error.response?.data?.message
+                    if (Array.isArray(message)) setToast({ message: message[0], severity: 'error' })
+                    else setToast({ message: message, severity: 'error' })
                 } else {
-                    setToast({ message: 'Something Went Wrong', severity: 'error' });
+                    setToast({ message: 'Something Went Wrong', severity: 'error' })
                 }
-                handleToastClick();
+                handleToastClick()
             }
         }
-    });
+    })
 
     // Will fetch user detail we need to update
     const fetchDetail = useCallback(async () => {
@@ -122,25 +124,25 @@ const AddEditForm = ({
                         'Content-Type': 'application/json'
                     }
                 })
-            ).json();
+            ).json()
 
-            formik.setFieldValue('email', user.email);
-            formik.setFieldValue('name', user.name);
-            formik.setFieldValue('mobile', user.mobile);
-            formik.setFieldValue('password', '');
-            formik.setFieldValue('newPassword', '');
-            formik.setFieldValue('oldPassword', '');
+            formik.setFieldValue('email', user.email)
+            formik.setFieldValue('name', user.name)
+            formik.setFieldValue('mobile', user.mobile)
+            formik.setFieldValue('password', '')
+            formik.setFieldValue('newPassword', '')
+            formik.setFieldValue('oldPassword', '')
         }
-    }, [formik, id]);
+    }, [formik, id])
 
     // Model state and handlers
     const handleOpen = () => {
-        setOpen(true);
-        fetchDetail();
-    };
+        setOpen(true)
+        fetchDetail()
+    }
     const handleClose = () => {
-        setOpen(false);
-    };
+        setOpen(false)
+    }
 
     return (
         <>
@@ -148,8 +150,10 @@ const AddEditForm = ({
             <IconButton onClick={handleOpen} color="primary" aria-label="Edit">
                 {id === 'add' ? (
                     <>
-                        <AddIcon />
-                        <div className="text-sm">Add user</div>
+                        <div className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm">
+                            <AddIcon />
+                            Add user
+                        </div>
                     </>
                 ) : (
                     <EditIcon />
@@ -165,6 +169,7 @@ const AddEditForm = ({
                             fullWidth
                             id="name"
                             name="name"
+                            required={true}
                             label="Name"
                             variant="outlined"
                             margin="normal"
@@ -177,6 +182,7 @@ const AddEditForm = ({
                             fullWidth
                             id="email"
                             name="email"
+                            required={true}
                             label="Email"
                             variant="outlined"
                             margin="normal"
@@ -189,6 +195,7 @@ const AddEditForm = ({
                             fullWidth
                             id="mobile"
                             name="mobile"
+                            required={true}
                             label="Mobile"
                             variant="outlined"
                             margin="normal"
@@ -205,6 +212,7 @@ const AddEditForm = ({
                                 type="password"
                                 id="password"
                                 name="password"
+                                required={true}
                                 label="Password"
                                 variant="outlined"
                                 margin="normal"
@@ -255,7 +263,7 @@ const AddEditForm = ({
                 </DialogContent>
             </Dialog>
         </>
-    );
-};
+    )
+}
 
-export default AddEditForm;
+export default AddEditForm

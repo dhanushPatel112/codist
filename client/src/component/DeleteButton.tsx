@@ -1,23 +1,23 @@
-import React from 'react';
-import { IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
-import { Delete as DeleteIcon } from '@mui/icons-material';
+import React from 'react'
+import { IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material'
+import { Delete as DeleteIcon } from '@mui/icons-material'
 
 const DeleteButton = ({ params, onDelete }: { params: { row: { _id: string } }; onDelete: (userId: string) => void }) => {
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = React.useState(false)
 
     const handleOpen = () => {
-        setOpen(true);
-    };
+        setOpen(true)
+    }
 
     const handleClose = () => {
-        setOpen(false);
-    };
+        setOpen(false)
+    }
 
     const handleDelete = () => {
-        const userId = params.row._id;
-        onDelete(userId);
-        handleClose();
-    };
+        const userId = params.row._id
+        onDelete(userId)
+        handleClose()
+    }
 
     return (
         <>
@@ -35,7 +35,7 @@ const DeleteButton = ({ params, onDelete }: { params: { row: { _id: string } }; 
                 </DialogActions>
             </Dialog>
         </>
-    );
-};
+    )
+}
 
-export default DeleteButton;
+export default DeleteButton

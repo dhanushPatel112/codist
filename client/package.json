@@ -5,7 +5,8 @@
         "dev": "vite",
         "build": "tsc && vite build",
         "serve": "vite preview",
-        "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\""
+        "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --fix",
+        "format": "npx prettier --write \"src/**/*.{ts,tsx}\""
     },
     "peerDependencies": {
         "react": "^17.0.0 || ^18.0.0",

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import React, { useEffect, useState } from 'react'
+import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import {
     fetchUserList,
     userList,
@@ -7,76 +7,38 @@ import {
     searchAndFetchUserList,
     pageAndFetchUserList,
     deleteUserAndFetchUserList
-} from './userSlice';
-import { DataGrid } from '@mui/x-data-grid';
-import { Alert, AlertColor, Snackbar, Stack, alpha, styled } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import InputBase from '@mui/material/InputBase';
-import DeleteButton from '../../component/DeleteButton';
-import AddEditForm from '../../component/AddEditForm';
-import { AxiosError } from 'axios';
-
-// Styles Search component from mui
-const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-        backgroundColor: alpha(theme.palette.common.white, 0.25)
-    },
-    marginRight: theme.spacing(2),
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-        marginLeft: theme.spacing(3),
-        width: 'auto'
-    }
-}));
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-}));
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    '& .MuiInputBase-input': {
-        padding: theme.spacing(1, 1, 1, 0),
-        // vertical padding + font size from searchIcon
-        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('md')]: {
-            width: '20ch'
-        }
-    }
-}));
+} from './userSlice'
+import { DataGrid } from '@mui/x-data-grid'
+import { Alert, AlertColor, Snackbar, Stack } from '@mui/material'
+import DeleteButton from '../../component/DeleteButton'
+import AddEditForm from '../../component/AddEditForm'
+import { AxiosError } from 'axios'
+import TextField from '@mui/material/TextField'
+import IconButton from '@mui/material/IconButton'
+import SearchIcon from '@mui/icons-material/Search'
 
 const UserList = () => {
-    const dispatch = useAppDispatch();
+    const dispatch = useAppDispatch()
 
-    const { page, limit, data, totalCount } = useAppSelector(userList);
+    const { page, limit, data, totalCount } = useAppSelector(userList)
 
     // To fetch initially
     useEffect(() => {
-        dispatch(fetchUserList({ search: '', page: 0, limit: 10, sortBy: 'name', sortOrder: 'asc' }));
-    }, [dispatch]);
+        dispatch(fetchUserList({ search: '', page: 0, limit: 10, sortBy: 'name', sortOrder: 'asc' }))
+    }, [dispatch])
 
     // For toast message
-    const [open, setOpen] = useState(false);
-    const [{ message, severity }, setToast] = useState<{ message: string; severity: AlertColor }>({ message: '', severity: 'success' });
+    const [open, setOpen] = useState(false)
+    const [{ message, severity }, setToast] = useState<{ message: string; severity: AlertColor }>({ message: '', severity: 'success' })
     const handleClick = () => {
-        setOpen(true);
-    };
+        setOpen(true)
+    }
     const handleToastClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === 'clickaway') {
-            return;
+            return
         }
-        setOpen(false);
-    };
+        setOpen(false)
+    }
 
     // Define the columns
     const columns = [
@@ -95,17 +57,18 @@ const UserList = () => {
                     <DeleteButton
                         onDelete={async (id) => {
                             try {
-                                await dispatch(deleteUserAndFetchUserList({ id }));
-                                setToast({ message: 'Deleted Successfully', severity: 'success' });
-                                handleClick();
+                                await dispatch(deleteUserAndFetchUserList({ id }))
+                                setToast({ message: 'Deleted Successfully', severity: 'success' })
+                                handleClick()
                             } catch (error) {
                                 if (error instanceof AxiosError) {
-                                    setToast({ message: error.response?.data?.message, severity: 'error' });
-                                    handleClick();
+                                    const message = error.response?.data?.message
+                                    if (Array.isArray(message)) setToast({ message: message[0], severity: 'error' })
+                                    else setToast({ message: message, severity: 'error' })
                                 } else {
-                                    setToast({ message: 'Something Went Wrong', severity: 'error' });
-                                    handleClick();
+                                    setToast({ message: 'Something Went Wrong', severity: 'error' })
                                 }
+                                handleClick()
                             }
                         }}
                         params={params}
@@ -114,14 +77,14 @@ const UserList = () => {
                 </>
             )
         }
-    ];
+    ]
 
     return (
         <>
             {/* Toast */}
             <Stack spacing={2} sx={{ width: '100%' }}>
                 <Snackbar open={open} autoHideDuration={6000} onClose={handleToastClose}>
-                    <Alert onClose={handleToastClose} severity={severity} sx={{ width: '100%' }}>
+                    <Alert onClose={handleToastClose} severity={severity} sx={{ width: '100%', minWidth: '200px' }}>
                         {message}
                     </Alert>
                 </Snackbar>
@@ -129,18 +92,22 @@ const UserList = () => {
             <div className="sm:m-2 md:m-20 lg:m-32" style={{ height: 400 }}>
                 <div className="flex justify-between mx-7">
                     {/* Search box */}
-                    <Search>
-                        <SearchIconWrapper>
+                    <div className="m-0 p-0">
+                        <IconButton type="submit" aria-label="search">
                             <SearchIcon />
-                        </SearchIconWrapper>
-                        <StyledInputBase
-                            onChange={(e) => {
-                                dispatch(searchAndFetchUserList(e.target.value));
+                        </IconButton>
+                        <TextField
+                            id="search-bar"
+                            className="text"
+                            onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                dispatch(searchAndFetchUserList(e.target.value))
                             }}
-                            placeholder="Search…"
-                            inputProps={{ 'aria-label': 'search' }}
+                            label="Search name, email or mobile"
+                            variant="standard"
+                            placeholder="Search..."
+                            size="small"
                         />
-                    </Search>
+                    </div>
                     {/* Add user Model */}
                     <AddEditForm key={'add'} id="add" handleToastClick={handleClick} setToast={setToast} />
                 </div>
@@ -154,18 +121,18 @@ const UserList = () => {
                     pageSizeOptions={[5, 10, 20, 100]}
                     paginationModel={{ page, pageSize: limit }}
                     onPaginationModelChange={(params) => {
-                        dispatch(pageAndFetchUserList({ limit: params.pageSize, page: params.page }));
+                        dispatch(pageAndFetchUserList({ limit: params.pageSize, page: params.page }))
                     }}
                     sortingMode="server"
                     onSortModelChange={(params) => {
-                        dispatch(sortAndFetchUserList({ sortBy: params[0]?.field, sortOrder: params[0]?.sort ?? 'asc' }));
+                        dispatch(sortAndFetchUserList({ sortBy: params[0]?.field, sortOrder: params[0]?.sort ?? 'asc' }))
                     }}
                     disableColumnMenu
                     rowSelection={false}
                 />
             </div>
         </>
-    );
-};
+    )
+}
 
-export default UserList;
+export default UserList

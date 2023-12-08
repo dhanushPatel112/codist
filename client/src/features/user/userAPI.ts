@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { AddUser, PaginationState, EditUser } from './userSlice';
+import axios from 'axios'
+import { AddUser, PaginationState, EditUser } from './userSlice'
 
 export async function fetchUserApi({ limit, page, sortOrder, sortBy, search }: Partial<PaginationState>) {
     const response = await axios.get(`${import.meta.env.VITE_API}/user`, {
@@ -10,14 +10,14 @@ export async function fetchUserApi({ limit, page, sortOrder, sortBy, search }: P
             sortBy,
             search
         }
-    });
+    })
 
-    return response.data;
+    return response.data
 }
 
 export async function deleteUserApi(id: string) {
-    const response = await axios.delete(`${import.meta.env.VITE_API}/user/${id}`);
-    return response.data;
+    const response = await axios.delete(`${import.meta.env.VITE_API}/user/${id}`)
+    return response.data
 }
 
 export async function addUserApi(data: AddUser): Promise<{ [x: string]: string | number }> {
@@ -25,8 +25,8 @@ export async function addUserApi(data: AddUser): Promise<{ [x: string]: string |
         headers: {
             'Content-Type': 'application/json'
         }
-    });
-    return response.data;
+    })
+    return response.data
 }
 
 export async function editUserApi(data: EditUser): Promise<{ [x: string]: string | number }> {
@@ -34,6 +34,6 @@ export async function editUserApi(data: EditUser): Promise<{ [x: string]: string
         headers: {
             'Content-Type': 'application/json'
         }
-    });
-    return response.data;
+    })
+    return response.data
 }
